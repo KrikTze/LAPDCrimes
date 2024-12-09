@@ -1,0 +1,64 @@
+﻿@{
+    @using LAPDCrimes.Models
+    @model List<QueryViewModel>
+
+    <h1>Select a Query</h1>
+
+    <select id="querySelect">
+        <option value="">--Select a Query--</option>
+        @foreach (var q in Model)
+        {
+            <option value="@q.Value">@q.Text</option>
+        }
+    </select>
+
+    <div id="queryFormContainer"></div>
+
+    <div id="resultsContainer"></div>
+
+    @section Scripts {
+        <script>
+            document.getElementById("querySelect").addEventListener("change", function() {
+                var queryType = this.value;
+                if (!queryType) {
+                    document.getElementById("queryFormContainer").innerHTML = "";
+                    return;
+                }
+
+                fetch(`/Crime/GetQueryForm?queryType=${queryType}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("queryFormContainer").innerHTML = html;
+                        const formElement = document.getElementById("queryForm");
+                        if (formElement) {
+                            formElement.addEventListener("submit", function (e) {
+                                e.preventDefault(); // Prevent default form submission
+
+                                const formData = new FormData(formElement);
+
+                                // Fetch results via POST request
+                                fetch(`/Crime/ExecuteQuery?queryType=${queryType}`, {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        document.getElementById("resultsContainer").innerHTML = html;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error submitting the form:", error);
+                                        alert("An error occurred while processing the query.");
+                                    });
+                            });
+                        } else {
+                            console.error("Form element not found in the loaded partial view.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error loading the query form:", error);
+                        alert("An error occurred while loading the query form.");
+                    });
+            });
+        </script>
+    }
+}

@@ -1,0 +1,1 @@
+SELECT drno,date_occ
