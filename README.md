@@ -2,13 +2,17 @@
 
 Project01 - M149
 
-Name: Krikor
+Name: Krikor 
 Surname: Tzevachirian
 AM: 7115112400005
 
-Introduction:
+## Introduction: 
+Most of the objectives required have been completed.
+The webapp supports authentication and authorization.
+10/12 queries are successfully executed.
 
-CrimesDB Schema:
+
+## CrimesDB Schema:
 ![Untitled](https://github.com/user-attachments/assets/7265a9bf-c37f-4ab8-8f76-2cdcbc928aba)
 The csv has been broken down to the following 11 tables 
 
@@ -174,5 +178,47 @@ ALTER TABLE IF EXISTS "CrimesSchema".crimes_victims
     ON DELETE NO ACTION;
 
     
-Design Choices:
-During data insertion, I avoided dropping records because of the nature of the information.
+## Design Choices:
+1) During data insertion, I avoided dropping records due to the nature of the information.
+I would rather have a record with some unreported information that drop the row.
+
+2) While designing the database, I tried to break apart the csv to create a normalized schema with
+little to no duplication. Eventually, arriving at the current Schema, which focuses around the main tables
+crimes, location, crimes_commited, while the others act as a supporting role.
+
+3) The location table is not fully normalized. One large address for example can have multiple lat-lon combos.
+However, I decided against breaking it further apart since: i) the duplication was relatively small in the db (about 1.5 times).
+ii) Conceptually these values belong together. iii) it makes querying easier.
+
+4) A junction table is created between crime_codes and drnos for normalization and real-world application purposes.
+To keep track of the main crime, a column with a boolean value is added.
+
+5) The same reasoning was followed with victims, because in real life one crime can have multiple victims.
+
+6) Indexes were added on the following columns ( apart from the primary keys ):
+i) crimes.date_occ, ii) crimes.date_rptd, iii) location.loc_point
+The first two are used extensively in the queries, as for the last I believe that
+any type of meaningful extension will require some sort of geolocation querying.
+
+7) To insert the data, I used a python script to first structure it and then insert it
+using batches of 1000 - 10000 ( depending on the table ) for faster insertion
+
+8) For the website, my framework of choice is .net8.0.
+The entityframework package supports complex relationships between models and
+the usage of linq and other techniques to query the data. However, since I had already
+written the queries in raw sql, I decided to use the already completed queries instead of
+creating and mapping the relationships between the tables.
+For authentication-authorization the identityframework package is used.
+
+## Use Case:
+After launching the site, the user has to register in order to be able to query the database.
+While logged in, the user has access to a list of predefined sql queries to parameterize.
+After selecting a query and filling the required information. An Ajax request is executed and 
+the results of the query are fetched back at the user.
+
+## Additional Notes:
+- 10/12 queries can be found in the sql scripts folder. However only the first 5 are available in the website
+This is temporary and will change soon.
+- The styling of the website will change as well.
+
+
