@@ -1,0 +1,17 @@
+﻿@{
+    @model List<QueryParameterDefinition>
+
+    <form id="queryForm">
+        @foreach (var param in Model)
+    {
+            <div>
+                <label>@param.FieldName</label>
+                <input name="@param.FieldName" type="@param.FieldType" />
+            </div>
+    }
+        <button type="submit">Run Query Please</button>
+    </form>
+
+    @section Scripts {
+    }
+}

@@ -1,0 +1,38 @@
+﻿@using LAPDCrimes.Models.QueryModels
+
+@model List<Query02>
+
+<h2>Query Results</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No results found.</p>
+}
+else
+{
+    var firstItem = Model.First();
+    var props = firstItem.GetType().GetProperties();
+
+    <table>
+        <thead>
+            <tr>
+                @foreach (var p in props)
+                {
+                    <th>@p.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    @foreach (var p in props)
+                    {
+                        <td>@p.GetValue(item)</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
